@@ -1,0 +1,31 @@
+version: '3'
+services:
+
+  echo-server1:
+    container_name: mvm-echo1
+    image: ealen/echo-server:latest
+    networks:
+      - mvm-echo
+
+  echo-server2:
+    container_name: mvm-echo2
+    image: ealen/echo-server:latest
+    networks:
+      - mvm-echo
+
+  nginx-gateway:
+    container_name: mvm-echo-nginx
+    image: nginx
+    environment:
+      # "$(pwd)/nginx.conf":/etc/nginx/nginx.conf:ro
+      X: y
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "9080:80"
+    networks:
+      - mvm-echo
+
+networks:
+  mvm-echo:
+    driver: bridge
