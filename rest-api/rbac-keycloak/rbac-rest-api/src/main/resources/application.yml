@@ -1,0 +1,95 @@
+#debug: true
+#debug: false
+
+logging:
+  level:
+    root: INFO
+    net:
+      mmeany: TRACE
+    org:
+      springframework:
+        security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%method:%line] - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  info:
+    env:
+      enabled: true
+    git:
+      mode: full
+    java:
+      enabled: true
+
+mvm:
+  allowedOrigins: https://mmeany.net,https://www.mmeany.net
+  users:
+    - username: mark
+      password: _undisclosed_
+      encrypted: "${BASIC_AUTH_PASSWORD:{noop}Password123}"
+      roles: ADMIN
+  keycloak:
+    client-id: blog-service
+    # http://KEYCLOAK_SERVER_BASE_URL/realms/REALM
+    public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuKZc5S1ulwtjTZwTuan87op+d4ZNKLewjlMU+R9kljmbCEyYPeoPLc4UfdRr5tSR/5XiDMvWCZ9hPR+keSstC3OBRBkvZwowBCAhckFIb1OymX6pb53Z82mhTLZIPy5Ur+sqyjIzVYfD7xTOXFSJdJ6aSQAg0h0kL19VM/lbUBp8N87RpR+KRb6Bh9F1G/3Xciu+UdglnEu9kpqbvHqNoVPoy80PklQfI8DkLrbTPcF5qXOiF/v3AZCtmpTYdmCQOUx8Dr83iXmUDNv2hWeMh24DzkvOZ5nLWLlGu/dI4afZBJYKOgYhvypU/bO2NlYupokBhYR/nr9fo+yiJe4cwwIDAQAB
+
+server:
+  port: ${PORT:9081}
+  servlet:
+    session:
+      timeout: 1h
+
+---
+spring.config.activate.on-profile: test
+
+logging:
+  level:
+    root: INFO
+    net:
+      mmeany: TRACE
+    com:
+      github:
+        dockerjava: WARN
+    org:
+      testcontainers: WARN
+      springframework:
+        security: INFO
+
+mvm:
+  allowedOrigins: https://mmeany.net,https://www.mmeany.net
+  users:
+    - username: test-user-1
+      password: Password123
+      encrypted: "{noop}Password123"
+      roles: ADMIN
+    - username: test-user-2
+      password: Password123
+      encrypted: "{noop}Password123"
+      roles: MANAGER
+    - username: test-user-3
+      password: Password123
+      encrypted: "{noop}Password123"
+      roles: MEMBER
+    - username: test-user-4
+      password: Password123
+      encrypted: "{noop}Password123"
+      roles:
+  keycloak:
+    client-id: blog-service
+    # http://localhost:9080/realms/dev
+    public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuKZc5S1ulwtjTZwTuan87op+d4ZNKLewjlMU+R9kljmbCEyYPeoPLc4UfdRr5tSR/5XiDMvWCZ9hPR+keSstC3OBRBkvZwowBCAhckFIb1OymX6pb53Z82mhTLZIPy5Ur+sqyjIzVYfD7xTOXFSJdJ6aSQAg0h0kL19VM/lbUBp8N87RpR+KRb6Bh9F1G/3Xciu+UdglnEu9kpqbvHqNoVPoy80PklQfI8DkLrbTPcF5qXOiF/v3AZCtmpTYdmCQOUx8Dr83iXmUDNv2hWeMh24DzkvOZ5nLWLlGu/dI4afZBJYKOgYhvypU/bO2NlYupokBhYR/nr9fo+yiJe4cwwIDAQAB
+
+---
+spring.config.activate.on-profile: test-containers
+
+#spring.jpa.properties.hibernate.integration.envers.enabled: false
+
+#spring:
+#  datasource:
+#    url: jdbc:tc:postgresql:14-3.3:///test_database
+#    username: user
+#    password: password

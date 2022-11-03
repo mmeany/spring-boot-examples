@@ -1,0 +1,6 @@
+config.stopBubbling=true
+lombok.accessors.chain=true
+lombok.tostring.callsuper=call
+lombok.equalsandhashcode.callsuper=call
+lombok.addLombokGeneratedAnnotation=true
+lombok.extern.findbugs.addSuppressFBWarnings=true

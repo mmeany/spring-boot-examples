@@ -1,0 +1,113 @@
+#debug: true
+#debug: false
+
+logging:
+  level:
+    root: INFO
+    net:
+      mmeany: TRACE
+    org:
+      springframework:
+        security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%method:%line] - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  info:
+    env:
+      enabled: true
+    git:
+      mode: full
+    java:
+      enabled: true
+
+mvm:
+  allowedOrigins: https://mmeany.net,https://www.mmeany.net
+  users:
+    - username: mark
+      password: _undisclosed_
+      encrypted: "${BASIC_AUTH_PASSWORD:{noop}Password123}"
+      roles: ADMIN
+
+server:
+  port: ${PORT:9081}
+  servlet:
+    session:
+      timeout: 1h
+
+spring:
+  datasource:
+    hikari:
+      connection-test-query: SELECT 1
+      # Clients can wait for up to 2 seconds
+      connection-timeout: 2000
+      # Connections recycled after 30 minutes
+      max-lifetime: 1800000
+      maximum-pool-size: 10
+      # Always keep at least one idle connection in the pool
+      minimum-idle: 1
+      # Expunge a connection after it has been idle for 30 seconds
+      idle-timeout: 30000
+      autoCommit: false
+    username: mark
+    password: my-secret-pw
+    # See: https://vladmihalcea.com/mysql-jdbc-statement-caching/
+    url: jdbc:postgresql://localhost:5432/mvm
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        cache:
+          use_query_cache: false
+          use_second_level_cache: false
+          region:
+          factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+        generate_statistics: false
+        hbm2ddl:
+          # drop-create create update validate none
+          auto: update
+    show-sql: true
+
+---
+spring.config.activate.on-profile: test
+
+logging:
+  level:
+    root: INFO
+    net:
+      mmeany: TRACE
+    org:
+      testcontainers: WARN
+      springframework:
+        security: INFO
+
+mvm:
+  allowedOrigins: https://mmeany.net,https://www.mmeany.net
+  users:
+    - username: test-user-1
+      password: Password123
+      encrypted: "{noop}Password123"
+      roles: ADMIN
+    - username: test-user-2
+      password: Password123
+      encrypted: "{noop}Password123"
+      roles: CREATE_BLOG
+    - username: test-user-3
+      password: Password123
+      encrypted: "{noop}Password123"
+      roles:
+
+---
+spring.config.activate.on-profile: test-containers
+
+#spring.jpa.properties.hibernate.integration.envers.enabled: false
+
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:13.4:///test_database
+    username: user
+    password: password

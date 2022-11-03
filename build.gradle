@@ -1,0 +1,70 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+plugins {
+    id 'io.spring.dependency-management'
+    id 'org.springframework.boot' apply false
+    id 'java'
+    id "com.github.spotbugs" version "5.0.12"
+    id 'idea'
+    id 'com.gorylenko.gradle-git-properties' version '2.4.1'
+}
+
+ext['junit-jupiter.version'] = "${junitVersion}"
+
+repositories {
+    mavenCentral()
+}
+
+group = 'net.mmeany.example'
+version "${appVersion}"
+
+subprojects {
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java'
+    apply plugin: 'com.gorylenko.gradle-git-properties'
+
+    version "${appVersion}"
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    dependencies {
+        compileOnly "org.projectlombok:lombok"
+        annotationProcessor "org.projectlombok:lombok"
+
+        implementation "com.fasterxml.jackson.core:jackson-databind"
+        implementation "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}"
+
+        testCompileOnly "org.projectlombok:lombok"
+        testAnnotationProcessor "org.projectlombok:lombok"
+
+        testImplementation "org.hamcrest:hamcrest"
+        testImplementation 'org.junit.platform:junit-platform-suite-api'
+    }
+
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+        systemProperty("cucumber.junit-platform.naming-strategy", "long")
+    }
+
+    spotbugs {
+        excludeFilter = file("${project.rootDir}/spotbugs-exclude.xml")
+    }
+}

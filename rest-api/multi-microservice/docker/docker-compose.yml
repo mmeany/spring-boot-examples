@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:19.0.1
+    ports:
+      - 9080:8080
+    environment:
+      - KEYCLOAK_ADMIN=${mvm_username}
+      - KEYCLOAK_ADMIN_PASSWORD=${mvm_password}
+      - KC_DB=postgres
+      - KC_DB_USERNAME=${mvm_username}
+      - KC_DB_PASSWORD=${mvm_password}
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    command:
+      - "start-dev --import-realm"
+    networks:
+      - postgres
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    container_name: postgres
+    image: postgis/postgis:14-3.3
+    environment:
+      POSTGRES_USER: ${mvm_username}
+      POSTGRES_PASSWORD: ${mvm_password}
+      #PGDATA: /data/postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./postgres:/data/host
+      - ./sql/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:

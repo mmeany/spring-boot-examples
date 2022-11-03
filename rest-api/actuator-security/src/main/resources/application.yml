@@ -1,0 +1,27 @@
+logging:
+  level:
+    root: INFO
+    net:
+      mmeany: TRACE
+    org:
+      springframework:
+        security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%method:%line] - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+
+server:
+  port: ${PORT:9081}
+  servlet:
+    session:
+      timeout: 1h

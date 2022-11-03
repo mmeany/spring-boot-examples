@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+
+  keycloak:
+    container_name: mvm-keycloak
+    image: quay.io/keycloak/keycloak:19.0.1
+    ports:
+      - 9080:8080
+    environment:
+      - KEYCLOAK_ADMIN=${mvm_username}
+      - KEYCLOAK_ADMIN_PASSWORD=${mvm_password}
+      - KC_DB=postgres
+      - KC_DB_USERNAME=${mvm_username}
+      - KC_DB_PASSWORD=${mvm_password}
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    command:
+      - "start-dev --import-realm -Dkeycloak.profile.feature.upload_scripts=enabled"
+    networks:
+      - postgres
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    container_name: mvm-postgres
+    image: postgis/postgis:14-3.3
+    environment:
+      POSTGRES_USER: ${mvm_username}
+      POSTGRES_PASSWORD: ${mvm_password}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+      - ./postgres-data:/data/host
+      - ./sql/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  pulsar:
+    container_name: mvm-pulsar
+    image: "apachepulsar/pulsar:2.10.1"
+    command: bin/pulsar standalone
+    #environment:
+    #PULSAR_MEM: " -Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g"
+    volumes:
+      - pulsardata:/pulsar/data
+      - pulsarconf:/pulsar/conf
+    ports:
+      - "6650:6650"
+      - "9091:8080"
+    restart: unless-stopped
+
+  mailserver:
+    container_name: mvm-inbucket
+    image: inbucket/inbucket
+    ports:
+      - "9092:9000"
+      - "2500:2500"
+      - "1100:1100"
+    environment:
+      - INBUCKET_LOGLEVEL=info
+      - INBUCKET_MAILBOXNAMING=full
+      - INBUCKET_STORAGE_PARAMS=path:/tmp/inbucket
+      - INBUCKET_STORAGE_RETENTIONPERIOD=72h
+      - INBUCKET_STORAGE_RETENTIONSLEEP=60s
+      - INBUCKET_STORAGE_MAILBOXMSGCAP=200
+    volumes:
+      - ./mail:/tmp/inbucket"
+    restart: unless-stopped
+
+  sftp:
+    container_name: mvm-sftp
+    image: atmoz/sftp
+    volumes:
+      - ./sftp:/home/${mvm_username}
+    ports:
+      - "9093:22"
+    command: ${mvm_username}:${mvm_password}:1000
+    restart: unless-stopped
+
+  mysql8:
+    container_name: mvm-mysql8
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./shared:/mvm
+      - mysqldata:/var/lib/mysql
+      - mysqlfiles:/var/lib/mysql-files
+      - ./mysql8/config:/etc/mysql/conf.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=${mvm_password}
+    command: [ mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci ]
+    #command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --innodb_force_recovery=1]
+    restart: unless-stopped
+
+    # Redis
+    
+    # RabbitMQ
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  mysqldata:
+  mysqlfiles:
+  postgres:
+  pulsardata:
+  pulsarconf:

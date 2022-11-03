@@ -1,0 +1,37 @@
+pluginManagement {
+    plugins {
+        id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+        id 'org.springframework.boot' version "${springBootVersion}"
+        id 'com.palantir.docker' version "${palantirDockerVersion}"
+    }
+}
+
+rootProject.name = 'spring-boot-examples'
+include(
+        'rest-api/common',
+        'rest-api/actuator-security',
+        'rest-api/rbac-keycloak/rbac-rest-api-model',
+        'rest-api/example-api/sample-rest-api',
+        'rest-api/example-api/sample-rest-api-model',
+        'rest-api/multi-microservice/blog-api',
+        'rest-api/multi-microservice/blog-api-model',
+        'rest-api/multi-microservice/comment-api',
+        'rest-api/multi-microservice/comment-api-model',
+        'rest-api/rbac-keycloak/rbac-rest-api',
+        'rest-api/rbac-keycloak/rbac-rest-api-model',
+        'rest-api/cucumber-spring-testcontainers',
+        // New includes here
+)
+
+project(':rest-api/common').name = 'common'
+project(':rest-api/actuator-security').name = 'actuator-security'
+project(':rest-api/example-api/sample-rest-api').name = 'sample-rest-api'
+project(':rest-api/example-api/sample-rest-api-model').name = 'sample-rest-api-model'
+project(':rest-api/multi-microservice/blog-api').name = 'multi-blog-api'
+project(':rest-api/multi-microservice/blog-api-model').name = 'multi-blog-api-model'
+project(':rest-api/multi-microservice/comment-api').name = 'multi-comment-api'
+project(':rest-api/multi-microservice/comment-api-model').name = 'multi-comment-api-model'
+project(':rest-api/rbac-keycloak/rbac-rest-api').name = 'rbac-rest-api'
+project(':rest-api/rbac-keycloak/rbac-rest-api-model').name = 'rbac-rest-api-model'
+project(':rest-api/cucumber-spring-testcontainers').name = 'cucumber-spring-testcontainers'
+// New projects here
