@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test the APIs</title>
+    <style>
+        .container {
+            margin: auto;
+            width: 50%;
+            height: 50%;
+        }
+
+        .row {
+            padding-top: 1rem;
+        }
+
+        label {
+            display: inline-block;
+            width: 5rem;
+        }
+
+        input.url {
+            width: 20rem;
+        }
+
+        button {
+            align-self: flex-end;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <label for="username">Username</label>
+        <input id="username" type="text" value="mark">
+    </div>
+    <div class="row">
+        <label for="password">Password</label>
+        <input id="password" type="password" value="Password123">
+    </div>
+    <div class="row">
+        <label for="apply">Apply Basic Auth header</label>
+        <input id="apply" type="checkbox">
+    </div>
+    <hr>
+    <div class="row">
+        <label for="url">Base URL</label>
+        <input class="url" id="url" type="url" value="http://mvm.com:9080">
+    </div>
+    <!--
+        <div class="row">
+            <label for="url">Service</label>
+            <input class="url" id="service" type="url" value="dopey-service">
+        </div>
+    -->
+    <div class="row">
+        <label for="service">Service</label>
+        <select name="service" id="service">
+            <option value="bashful-service">bashful-service</option>
+            <option value="grumpy-service">grumpy-service</option>
+            <option value="dopey-service">dopey-service</option>
+        </select>
+    </div>
+    <div class="row">
+        <label for="endpoint">Endpoint</label>
+        <input class="url" id="endpoint" type="text" value="/api/hello/Mark">
+    </div>
+    <div class="row">
+        <p>Note that CORS has not been configured for the Actuator endpoints</p>
+    </div>
+    <div class="row">
+        <label for="quick">Quick set</label>
+        <span id="quick">
+            <strong>API</strong>:
+            <a href="#" onclick="return setEndpoint('hello');">hello</a> |
+            <a href="#" onclick="return setEndpoint('header');">header</a> |
+            <strong>Actuator</strong>:
+            <a href="#" onclick="return setEndpoint('health');">health</a> |
+            <a href="#" onclick="return setEndpoint('info');">info</a> |
+            <a href="#" onclick="return setEndpoint('env');">env</a> |
+            <a href="#" onclick="return setEndpoint('metrics');">metrics</a> |
+        </span>
+    </div>
+    <div class="row">
+        <button onclick="hitTheApi()">Fire GET request</button>
+    </div>
+    <div class="row">
+        <p id="resolved"></p>
+        <pre id="result"></pre>
+    </div>
+</div>
+
+<script>
+    function hitTheApi() {
+        let applyBasicAuth = document.getElementById("apply").checked;
+        let service = document.getElementById("service").value;
+        let credentials = applyBasicAuth
+            ? {'Authorization': "Basic " + btoa(document.getElementById('username').value + ":" + document.getElementById('password').value)}
+            : {};
+        let endpoint = document.getElementById('url').value + '/' + service + document.getElementById('endpoint').value;
+        document.getElementById('resolved').innerText = endpoint;
+        fetch(endpoint, {
+            method: 'GET',
+            headers: credentials
+        })
+            .then(response => response.json())
+            .then(json => document.getElementById('result').innerText = JSON.stringify(json, null, 2))
+            .catch(err => document.getElementById('result').innerText = `There was an error, '${err}', check Javascript console.`);
+    }
+
+    function setEndpoint(e) {
+        let endpoint = document.getElementById('endpoint');
+        switch (e) {
+            case 'hello':
+                endpoint.value = '/api/hello/Mark';
+                break;
+            case 'header':
+                endpoint.value = '/api/headers';
+                break;
+            case 'health':
+                endpoint.value = '/actuator/health';
+                break;
+            case 'info':
+                endpoint.value = '/actuator/info';
+                break;
+            case 'env':
+                endpoint.value = '/actuator/env';
+                break;
+            case 'metrics':
+                endpoint.value = '/actuator/metrics';
+                break;
+            default:
+                console.log("???");
+        }
+        return false;
+    }
+</script>
+</body>
+</html>

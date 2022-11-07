@@ -1,24 +1,43 @@
 version: '3'
 services:
 
-  echo-server1:
-    container_name: mvm-echo1
-    image: ealen/echo-server:latest
+  bashfull:
+    container_name: bashful-service
+    image: docker.io/library/nginx-api-gateway:1.0-SNAPSHOT
+    environment:
+      SERVER_PORT: 80
+      APP_CONFIG_ID: Bashful
+      APP_CONFIG_SECURITY_ENABLED: false
     networks:
       - mvm-echo
 
-  echo-server2:
-    container_name: mvm-echo2
-    image: ealen/echo-server:latest
+  grumpy:
+    container_name: grumpy-service
+    image: docker.io/library/nginx-api-gateway:1.0-SNAPSHOT
+    environment:
+      SERVER_PORT: 80
+      APP_CONFIG_ID: Grumpy
+      APP_CONFIG_SECURITY_ENABLED: true
+    networks:
+      - mvm-echo
+
+  dopey:
+    container_name: dopey-service
+    image: docker.io/library/nginx-api-gateway:1.0-SNAPSHOT
+    environment:
+      SERVER_PORT: 80
+      APP_CONFIG_ID: Dopey
+      APP_CONFIG_SECURITY_ENABLED: false
+      BPL_DEBUG_ENABLED: true
+    ports:
+      - "8000:8000"
     networks:
       - mvm-echo
 
   nginx-gateway:
     container_name: mvm-echo-nginx
     image: nginx
-    environment:
-      # "$(pwd)/nginx.conf":/etc/nginx/nginx.conf:ro
-      X: y
+    #command: [ nginx-debug, '-g', 'daemon off;' ]
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:

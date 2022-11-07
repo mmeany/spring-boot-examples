@@ -1,0 +1,46 @@
+#debug: true
+#debug: false
+
+logging:
+  level:
+    root: INFO
+    net:
+      mmeany: TRACE
+    org:
+      springframework:
+        security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%method:%line] - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  info:
+    env:
+      enabled: true
+    git:
+      mode: full
+    java:
+      enabled: true
+
+appConfig:
+  # 9080 is the exposed port of Nginx when running docker compose
+  # 9081 is port this will run on from IntelliJ
+  allowedOrigins: http://mvm.com:9080,http://mvm.com:9081
+  id: "Rest API"
+  securityEnabled: false
+  users:
+    - username: mark
+      password: _undisclosed_
+      encrypted: "${BASIC_AUTH_PASSWORD:{noop}Password123}"
+      roles: ADMIN
+
+server:
+  port: ${PORT:9081}
+  servlet:
+    session:
+      timeout: 1h
+  forward-headers-strategy: framework
+  use-forward-headers: true

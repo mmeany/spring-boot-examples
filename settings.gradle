@@ -20,6 +20,7 @@ include(
         'rest-api/rbac-keycloak/rbac-rest-api',
         'rest-api/rbac-keycloak/rbac-rest-api-model',
         'rest-api/cucumber-spring-testcontainers',
+        'rest-api/nginx-api-gateway',
         // New includes here
 )
 
@@ -34,4 +35,5 @@ project(':rest-api/multi-microservice/comment-api-model').name = 'multi-comment-
 project(':rest-api/rbac-keycloak/rbac-rest-api').name = 'rbac-rest-api'
 project(':rest-api/rbac-keycloak/rbac-rest-api-model').name = 'rbac-rest-api-model'
 project(':rest-api/cucumber-spring-testcontainers').name = 'cucumber-spring-testcontainers'
+project(':rest-api/nginx-api-gateway').name = 'nginx-api-gateway'
 // New projects here

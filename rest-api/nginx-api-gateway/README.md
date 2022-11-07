@@ -1,28 +1,46 @@
-
 # Overview
 
-Experiment to get NginX to front APIs from two containers on the same domain.
+Experiment to get Nginx to front APIs from multiple containers on the same domain, using the first part of the path to determine which container to proxy.
 
-* The APIs are not exposed via ports on the host, only via the NginX exposed port
-* By adding an entry in `/etc/hosts` (`127.0.0.1 mvm.com`) both API can be accessed from the `mvm.com` domain
-* A path prefix is used to identify the intended API
-  * `/service-on` for the first API
-  * `/service-two` for the second API
+Individual APIs will only be accessible via Nginx, their ports not being exposed on the host.
+
+I was unable to get the Swagger UI to play nicely in this configuration and for that reason removed all OpenAPI configuration and dependencies.
+
+There is a single API project that can be configured with an `id` property that is contained in the response.
+
+The [docker-compose.yml](./docker/docker-compose.yml) file launches three instances of this API, each configured with a unique `id`, and an instance of Nginx [configured](./docker/nginx/nginx.conf) to
+proxy them by service name.
+
+To get this working, `mvm.com` must resolve to your localhost IP Address. The easiest way to achieve this is to add the following entry to your `hosts` file (
+Windows: `C:\Windows\System32\drivers\etc\hosts`, *nix: `/etc/hosts`):
+
+```text
+127.0.0.1 mvm.com
+```
+
+Details of the services exposed:
+
+| Container Name  | Example URL (through Nginx proxy)                  | Id      | Security Enabled |
+|-----------------|----------------------------------------------------|---------|------------------|
+| bashful-service | http://mvm.com:9080/bashful-service/api/hello/Mark | Bashful | false            |
+| grumpy-service  | http://mvm.com:9080/grumpy-service/api/hello/Mark  | Grumpy  | true             |
+| dopey-service   | http://mvm.com:9080/dopey-service/api/hello/Mark   | Dopey   | false            |
+
+Other endpoints:
+
+* [http://mvm.com:9080/bashful-service/api/headers](http://mvm.com:9080/bashful-service/api/headers)
+* [http://mvm.com:9080/bashful-service/actuator/health](http://mvm.com:9080/bashful-service/actuator/health)
+* [http://mvm.com:9080/bashful-service/actuator/info](http://mvm.com:9080/bashful-service/actuator/info)
+* [http://mvm.com:9080/bashful-service/actuator/env](http://mvm.com:9080/bashful-service/actuator/env)
+* [http://mvm.com:9080/bashful-service/actuator/metrics](http://mvm.com:9080/bashful-service/actuator/metrics)
 
 To try it out:
 
-```shell
-docker compose up -d
+* Add the required entry to your `hosts` file
+* Launch the docker compose
+* Run the application in IntelliJ (or whatever)
+* Visit (TestTheApis.html)[http://mvm.com:9081/TestTheApis.html], this is a [static web page](./src/main/resources/static/TestTheApis.html) created just for testing this application and deployed as
+  part of the API.
 
-# Make a note of mvm-echo1 & mvm-echo2 Container IDs from the following:
-docker ps
-
-# Hit the services, make sure they each return a hostname matching their container ID
-curl http://mvm.com:9080/service-two/?echo_env_body=HOSTNAME
-curl http://mvm.com:9080/service-one/?echo_env_body=HOSTNAME
-
-# Hit the services, get a little more insight
-curl -s http://mvm.com:9080/service-one/?query=demo | jq .
-curl -s http://mvm.com:9080/service-two/?query=demo | jq .
-```
-
+NOTE: The static page should be run from a web server and not just by double-clicking it. The reason being we want to check that CORS is working as well. The application run by IntelliJ will be served
+on port 9081, it is calling the API via Nginx on port 9082 and for this to work the API must allow requests from `http://mvm.com:9081`. 
