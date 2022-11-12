@@ -6,6 +6,7 @@ All project dependency versions are defined in the top level [gradle.properties]
 updating to newer version of libraries and frameworks simpler and highlight any issues with said upgrades early on.
 
 This is all a Work In Progress, as fleeting thoughts catch me I may add new projects without retro fitting to some that are already there (`common` is an example).
+
 # The Projects
 
 | Project                                                         | Description                                                                                                                      |
@@ -17,6 +18,7 @@ This is all a Work In Progress, as fleeting thoughts catch me I may add new proj
 | [Multi Microservice](./rest-api/multi-microservice/README.md)   | A collection of microservices, using JWT, intercommunication, docker based integration tests                                     |
 | [Exploring RBAC](./rest-api/rbac-keycloak/README.md)            | Using Keycloak to provide RBAC roles, either from realm or client claims (`` or ``)                                              |
 | [Docker](./docker/README.md)                                    | Docker compose file(s) for configuring environments                                                                              |
+| [Nginx API Gateway](./rest-api/nginx-api-gateway/README.md)     | Using Nginx to present multiple APIs from same domain:port                                                                       |
 
 Any requests?
 
